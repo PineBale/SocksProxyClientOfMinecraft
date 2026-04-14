@@ -1,0 +1,39 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.pinebale.minecraft.fabric.socksproxyclient.injection.mixin",
+  "plugin": "dev.pinebale.minecraft.fabric.socksproxyclient.injection.BaseMixinPlugin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "MixinAuthlibMinecraftClient",
+    "MixinConnection",
+    "MixinConnection_1",
+    "MixinConnectScreen_1",
+    "MixinDirectJoinServerScreen",
+    "MixinHttpAuthenticationService",
+    "MixinHttpUtil",
+    "MixinJoinMultiplayerScreen",
+    "MixinLocalSampleLogger",
+    "MixinMain",
+    "MixinManageServerScreen",
+    "MixinMinecraft",
+    "MixinMojangBlockListSupplier",
+    "MixinProxyHandler",
+    "MixinRealmsClient",
+    "MixinRealmsClientConfig",
+    "MixinServerData_Base",
+    "MixinServerData_Proxy",
+    "MixinServerStatusPingerContextualInfo",
+    "MixinServerStatusPingerNoLegacyPing",
+    "MixinServerStatusPingerPingCallbacks",
+    "MixinSkinTextureDownloader",
+    "MixinSocks5ProxyHandler",
+    "MixinYggdrasilAuthenticationService"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

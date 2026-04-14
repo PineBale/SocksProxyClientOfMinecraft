@@ -1,0 +1,100 @@
+package dev.pinebale.minecraft.fabric.socksproxyclient.doh.screen;
+
+import dev.pinebale.minecraft.fabric.socksproxyclient.dns.DNSUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSProvider;
+import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSResolver;
+import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSUtils;
+import lombok.NonNull;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+
+import java.util.function.BiConsumer;
+
+@Environment(EnvType.CLIENT)
+public final class ChooseDOHProviderScreen extends Screen {
+
+    private final Screen parent;
+
+    private final DNSOverHTTPSProvider initialDohSelection;
+    private final String initialCustomUrlSelection;
+
+    private CycleButton<DNSOverHTTPSProvider> dohSelectionButton;
+    private EditBox customUrlField;
+
+    private final BiConsumer<DNSOverHTTPSProvider, String> callback;
+
+    public ChooseDOHProviderScreen(
+        @NonNull final Screen parent,
+        @NonNull final BiConsumer<DNSOverHTTPSProvider, String> callback
+    ) {
+        super(Component.literal("Choose a DNS-Over-HTTPS provider"));
+        this.parent = parent;
+        try {
+            this.initialDohSelection = DNSOverHTTPSUtils.getProvider();
+            this.initialCustomUrlSelection = DNSOverHTTPSUtils.getCustomUrl();
+        } catch (Throwable e) {
+            throw new Error(e);
+        }
+        this.callback = callback;
+    }
+
+    @Override
+    protected void init() {
+        this.dohSelectionButton = CycleButton.builder(v -> Component.literal(v.getDisplayName()), this.initialDohSelection).withValues(DNSOverHTTPSProvider.values()).create(this.width / 2 - 100, 86, 200, 20, Component.literal("DNS-Over-HTTPS Provider"), (_, _) -> this.updateUrlField());
+        this.addRenderableWidget(this.dohSelectionButton);
+
+        this.customUrlField = new EditBox(this.font, this.width / 2 - 100, 126, 200, 20,
+            Component.literal("Custom DNS-Over-HTTPS URL"));
+        this.customUrlField.setValue(this.initialCustomUrlSelection);
+        this.addWidget(this.customUrlField);
+
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, _ -> this.onClose())
+            .bounds(this.width / 2 - 100, this.height - 30, 200, 20).build());
+
+        try {
+            if (!DNSUtils.getResolverClass().equals(DNSOverHTTPSResolver.class)) {
+                this.dohSelectionButton.active = false;
+                this.customUrlField.active = false;
+                this.customUrlField.setEditable(false);
+                return;
+            }
+        } catch (Throwable e) {
+            throw new Error(e);
+        }
+
+        this.updateUrlField();
+    }
+
+    @Override
+    protected void setInitialFocus() {
+        this.setInitialFocus(this.dohSelectionButton);
+    }
+
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractMenuBackground(graphics);
+        super.extractRenderState(graphics, mouseX, mouseY, a);
+        graphics.centeredText(this.font, this.title, this.width / 2, 17, -1);
+        graphics.text(this.font, Component.literal("Custom DNS-Over-HTTPS URL"), this.width / 2 - 100 + 1, 114, -6250336);
+        this.customUrlField.extractRenderState(graphics, mouseX, mouseY, a);
+    }
+
+    @Override
+    public void onClose() {
+        this.callback.accept(this.dohSelectionButton.getValue(), this.customUrlField.getValue());
+        this.minecraft.setScreen(this.parent);
+    }
+
+    private void updateUrlField() {
+        boolean v = this.dohSelectionButton.getValue().equals(DNSOverHTTPSProvider.CUSTOM);
+        this.customUrlField.active = v;
+        this.customUrlField.setEditable(v);
+    }
+}

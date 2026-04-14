@@ -1,0 +1,11 @@
+[*.java]
+indent_style = space
+indent_size = tab
+
+[*.kt]
+indent_style = space
+indent_size = tab
+
+[*.gradle.kts]
+indent_style = space
+indent_size = tab

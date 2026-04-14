@@ -1,0 +1,2 @@
+dev.pinebale.minecraft.fabric.socksproxyclient.dns.SystemResolver
+dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSResolver

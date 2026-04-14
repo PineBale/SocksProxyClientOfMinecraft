@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.pinebale.minecraft.fabric.socksproxyclient.doh.injection.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "MixinDohResolver"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

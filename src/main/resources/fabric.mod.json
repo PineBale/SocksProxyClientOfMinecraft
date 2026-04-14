@@ -1,38 +1,47 @@
 {
-	"schemaVersion": 1,
-	"id": "modid",
-	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.example.ExampleMod"
-		],
-		"client": [
-			"com.example.ExampleModClient"
-		]
-	},
-	"mixins": [
-		"modid.mixins.json",
-		{
-			"config": "modid.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.18.5",
-		"minecraft": "~26.1",
-		"java": ">=25",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "Connect to Minecraft servers through Socks proxy",
+  "authors": [
+    "PineBale",
+    "NorthRealm",
+    "CrimsonEdgeHope"
+  ],
+  "icon": "icon.png",
+  "license": "BSD-3-Clause",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.pinebale.minecraft.fabric.socksproxyclient.SocksProxyClientFabric"
+    ],
+    "modmenu": [
+      "dev.pinebale.minecraft.fabric.socksproxyclient.ModMenuEntry"
+    ]
+  },
+  "mixins": [
+    "base.mixins.json",
+    "dns.mixins.json",
+    "doh.mixins.json"
+  ],
+  "accessWidener": "base.classtweaker",
+  "depends": {
+    "minecraft": "${minecraft_dependency}",
+    "fabricloader": ">=${fabricloader_version}"
+  },
+  "recommends": {
+    "modmenu": "^${modmenu_version}",
+    "exploitpreventer": "*"
+  },
+  "conflicts": {
+    "fastipping": "*",
+    "viafabricplus": "*",
+    "meteor-client": "*"
+  },
+  "breaks": {
+    "yggdrasil-proxy-fabric": "*",
+    "proxyserver": "*",
+    "networkproxy": "*"
+  }
 }
