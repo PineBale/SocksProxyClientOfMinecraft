@@ -24,27 +24,36 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-// TODO: FIX
 @Environment(EnvType.CLIENT)
+// Created with the help of Gemini and Grok.
+// TODO: MORE MANUAL TEST
 public final class SettingsMenuScreen extends Screen {
     private final Screen parent;
 
+    private static final int buttonWidth = 150;
+    private static final int buttonHeight = 20;
+    private static final int buttonRowSpacing = 10;
+    private static final int buttonColumns = 2;
+
+    private int leftColumnX = 0;
+    private int rightColumnX = 0;
+
+    private static final int headerCut = 40;
+    private static final int footerCut = 50;
+
+    private int scrollBarX = 0;
+    private int scrollBarY = 0;
+    private double scrollBarHeight = 0.0;
+
     private double scrollAmount = 0.0;
     private double maxScroll = 0.0;
-
     private boolean draggingScrollBar = false;
     private double dragStartMouseY = 0.0;
     private double dragStartScrollAmount = 0.0;
 
-    private static final int buttonWidth = 150;
-    private static final int buttonHeight = 20;
-    private static final int spacing = 10;
-    private static final int columns = 2;
-
+    private record Category(String title, Supplier<Screen> subScreenSupplier) {}
     private final List<Button> buttons = new ArrayList<>();
     private final ImmutableList<Category> categories;
-
-    private record Category(String title, Supplier<Screen> subScreenSupplier) {}
 
     public SettingsMenuScreen(Screen parent) {
         super(Component.empty());
@@ -87,17 +96,23 @@ public final class SettingsMenuScreen extends Screen {
     @Override
     protected void init() {
         this.buttons.clear();
+
+        this.leftColumnX = this.width / 2 - 155;
+        this.rightColumnX = this.width / 2 + 5;
+
+        this.scrollBarX = this.width - 10;
+        this.scrollBarY = headerCut;
+        this.scrollBarHeight = this.height - 80;
+
         this.draggingScrollBar = false;
         this.dragStartMouseY = 0.0;
         this.dragStartScrollAmount = 0.0;
 
-        int startY = 40;
-        int rowHeight = buttonHeight + spacing;
+        int startY = headerCut;
+        int rowHeight = buttonHeight + buttonRowSpacing;
+        int numRows = (this.categories.size() + buttonColumns - 1) / buttonColumns;
 
-        int numRows = (this.categories.size() + columns - 1) / columns;
-
-        int bottomReserved = 50;
-        int visibleHeight = this.height - 40 - bottomReserved;
+        int visibleHeight = this.height - headerCut - footerCut;
         int contentHeight = startY + numRows * rowHeight;
 
         double oldMaxScroll = this.maxScroll;
@@ -109,13 +124,10 @@ public final class SettingsMenuScreen extends Screen {
             this.scrollAmount = 0.0;
         }
 
-        int leftX = this.width / 2 - 155;
-        int rightX = this.width / 2 + 5;
-
         for (int i = 0; i < this.categories.size(); i++) {
-            int col = i % columns;
-            int row = i / columns;
-            int x = col == 0 ? leftX : rightX;
+            int col = i % buttonColumns;
+            int row = i / buttonColumns;
+            int x = col == 0 ? this.leftColumnX : this.rightColumnX;
             int baseY = startY + row * rowHeight;
 
             final int v = i;
@@ -124,7 +136,7 @@ public final class SettingsMenuScreen extends Screen {
                 _ -> this.minecraft.setScreen(categories.get(v).subScreenSupplier.get())
             ).bounds(x, baseY, buttonWidth, buttonHeight).build();
 
-            this.addRenderableWidget(button);
+            this.addWidget(button);
             this.buttons.add(button);
         }
 
@@ -134,42 +146,46 @@ public final class SettingsMenuScreen extends Screen {
         this.updateButtonPositions();
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    private void updateButtonPositions() {
+        int startY = headerCut;
+        int rowHeight = buttonHeight + buttonRowSpacing;
+
+        for (int i = 0; i < this.buttons.size(); i++) {
+            int col = i % buttonColumns;
+            int row = i / buttonColumns;
+            int baseY = startY + row * rowHeight;
+            int y = (int) (baseY - this.scrollAmount);
+
+            Button btn = this.buttons.get(i);
+            btn.setX(col == 0 ? this.leftColumnX : this.rightColumnX);
+            btn.setY(y);
+
+            btn.active = y > headerCut - buttonHeight && y < this.height - footerCut;
+        }
+    }
+
     @Override
     public void onClose() {
         this.minecraft.setScreen(this.parent);
     }
 
-    private void updateButtonPositions() {
-        int leftX = this.width / 2 - 155;
-        int rightX = this.width / 2 + 5;
-        int startY = 40;
-        int rowHeight = buttonHeight + spacing;
-
-        for (int i = 0; i < this.buttons.size(); i++) {
-            int col = i % columns;
-            int row = i / columns;
-            int baseY = startY + row * rowHeight;
-            int y = (int) (baseY - this.scrollAmount);
-
-            Button btn = this.buttons.get(i);
-            btn.setX(col == 0 ? leftX : rightX);
-            btn.setY(y);
-        }
-    }
-
     @Override
     public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
         super.extractMenuBackground(graphics);
+
+        graphics.enableScissor(0, headerCut, this.width, this.height - footerCut);
+        for (Button btn : this.buttons) {
+            btn.extractRenderState(graphics, mouseX, mouseY, a);
+        }
+        graphics.disableScissor();
+
         super.extractRenderState(graphics, mouseX, mouseY, a);
         if (this.maxScroll > 0) {
-            int scrollbarX = this.width - 10;
-            int scrollbarY = 40;
-            int scrollbarHeight = this.height - 80;
-            double thumbHeight = Math.clamp((double) scrollbarHeight / (this.maxScroll + scrollbarHeight) * scrollbarHeight, 10, scrollbarHeight);
-            int thumbY = scrollbarY + (int) (this.scrollAmount / this.maxScroll * (scrollbarHeight - thumbHeight));
-
-            graphics.fill(scrollbarX, scrollbarY, scrollbarX + 6, scrollbarY + scrollbarHeight, 0xFF555555);
-            graphics.fill(scrollbarX, thumbY, scrollbarX + 6, thumbY + (int) thumbHeight, 0xFFAAAAAA);
+            double thumbHeight = Math.clamp(this.scrollBarHeight / (this.maxScroll + this.scrollBarHeight) * this.scrollBarHeight, 10, this.scrollBarHeight);
+            int thumbY = this.scrollBarY + (int) (this.scrollAmount / this.maxScroll * (this.scrollBarHeight - thumbHeight));
+            graphics.fill(this.scrollBarX, this.scrollBarY, this.scrollBarX + 6, (int) (this.scrollBarY + this.scrollBarHeight), 0xFF555555);
+            graphics.fill(this.scrollBarX, thumbY, this.scrollBarX + 6, thumbY + (int) thumbHeight, 0xFFAAAAAA);
         }
     }
 
@@ -189,29 +205,24 @@ public final class SettingsMenuScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (event.button() == 0 && maxScroll > 0) {
-            int scrollbarX = this.width - 10;
-            int scrollbarY = 40;
-            int scrollbarHeight = this.height - 80;
             double mouseX = event.x();
             double mouseY = event.y();
+            if (mouseX >= this.scrollBarX && mouseX <= this.scrollBarX + 6 &&
+                mouseY >= this.scrollBarY && mouseY <= this.scrollBarY + this.scrollBarHeight) {
 
-            if (mouseX >= scrollbarX && mouseX <= scrollbarX + 6 &&
-                mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight) {
-
-                double thumbHeight = Math.clamp((double) scrollbarHeight / (this.maxScroll + scrollbarHeight) * scrollbarHeight, 10, scrollbarHeight);
-                int thumbY = scrollbarY + (int) (this.scrollAmount / this.maxScroll * (scrollbarHeight - thumbHeight));
+                double thumbHeight = Math.clamp(this.scrollBarHeight / (this.maxScroll + this.scrollBarHeight) * this.scrollBarHeight, 10, this.scrollBarHeight);
+                int thumbY = this.scrollBarY + (int) (this.scrollAmount / this.maxScroll * (this.scrollBarHeight - thumbHeight));
 
                 if (mouseY >= thumbY && mouseY <= thumbY + (int) thumbHeight) {
                     this.draggingScrollBar = true;
                     this.dragStartMouseY = mouseY;
                     this.dragStartScrollAmount = this.scrollAmount;
-                    return true;
                 } else {
-                    double clickRatio = (mouseY - scrollbarY) / scrollbarHeight;
+                    double clickRatio = (mouseY - this.scrollBarY) / this.scrollBarHeight;
                     this.scrollAmount = Math.clamp(clickRatio * this.maxScroll, 0.0, this.maxScroll);
                     this.updateButtonPositions();
-                    return true;
                 }
+                return true;
             }
         }
         return super.mouseClicked(event, doubleClick);
@@ -220,9 +231,8 @@ public final class SettingsMenuScreen extends Screen {
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (this.draggingScrollBar && this.maxScroll > 0) {
-            int scrollbarHeight = this.height - 80;
-            double thumbHeight = Math.clamp((double) scrollbarHeight / (this.maxScroll + scrollbarHeight) * scrollbarHeight, 10, scrollbarHeight);
-            double scrollTrackHeight = scrollbarHeight - thumbHeight;
+            double thumbHeight = Math.clamp(this.scrollBarHeight / (this.maxScroll + this.scrollBarHeight) * this.scrollBarHeight, 10, this.scrollBarHeight);
+            double scrollTrackHeight = this.scrollBarHeight - thumbHeight;
 
             double deltaScroll = (event.y() - this.dragStartMouseY) * (this.maxScroll / scrollTrackHeight);
             this.scrollAmount = Math.clamp(this.dragStartScrollAmount + deltaScroll, 0.0, this.maxScroll);
