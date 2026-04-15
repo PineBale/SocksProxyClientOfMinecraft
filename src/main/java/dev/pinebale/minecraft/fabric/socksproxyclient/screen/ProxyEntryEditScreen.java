@@ -4,6 +4,7 @@ import com.google.common.net.HostAndPort;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.ConfigUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.entry.ProxyEntry;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.SocksProxyCredential;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import lombok.NonNull;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,6 +24,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Environment(EnvType.CLIENT)
+// FIXME: TO BE USED LATER.
 public final class ProxyEntryEditScreen extends Screen {
     private final Screen parent;
 
@@ -41,7 +43,7 @@ public final class ProxyEntryEditScreen extends Screen {
     private final Runnable callback;
 
     public ProxyEntryEditScreen(final Screen parent, @NonNull ProxyEntry entry, @NonNull final Runnable callback) {
-        super(Component.literal("Proxy edit screen"));
+        super(Component.empty());
         this.parent = parent;
         this.entry = entry;
         this.callback = callback;
@@ -49,8 +51,7 @@ public final class ProxyEntryEditScreen extends Screen {
 
     @Override
     protected void init() {
-        this.proxyAddressField = new EditBox(this.font, this.width / 2 - 100, 46, 200, 20,
-            Component.literal("Proxy Address"));
+        this.proxyAddressField = new EditBox(this.font, this.width / 2 - 100, 46, 200, 20, Component.empty());
         this.proxyAddressField.setMaxLength(262);
         String p = "";
         this.proxyAddressField.setValue(p);
@@ -63,14 +64,12 @@ public final class ProxyEntryEditScreen extends Screen {
         this.proxyAddressField.setResponder(_ -> this.updateSetButton());
         this.addWidget(this.proxyAddressField);
 
-        this.usernameField = new EditBox(this.font, this.width / 2 - 100, 86, 200, 20,
-            Component.literal("Username"));
+        this.usernameField = new EditBox(this.font, this.width / 2 - 100, 86, 200, 20, Component.empty());
         this.usernameField.setMaxLength(255);
         this.usernameField.setValue(Objects.requireNonNullElse(entry.getSocksProxyCredential().username(), ""));
         this.addWidget(this.usernameField);
 
-        this.passwordField = new EditBox(this.font, this.width / 2 - 100, 126, 200, 20,
-            Component.literal("Password"));
+        this.passwordField = new EditBox(this.font, this.width / 2 - 100, 126, 200, 20, Component.empty());
         this.passwordField.setMaxLength(255);
         this.passwordField.addFormatter((string, _) -> FormattedCharSequence.forward("*".repeat(string.length()), Style.EMPTY));
         this.passwordField.setValue(Objects.requireNonNullElse(entry.getSocksProxyCredential().password(), ""));
@@ -112,10 +111,9 @@ public final class ProxyEntryEditScreen extends Screen {
     @Override
     public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
         super.extractRenderState(graphics, mouseX, mouseY, a);
-        graphics.centeredText(this.font, this.title, this.width / 2, 17, -1);
-        graphics.text(this.font, Component.literal("Proxy Address"), this.width / 2 - 100 + 1, 33, -6250336);
-        graphics.text(this.font, Component.literal("Username"), this.width / 2 - 100 + 1, 74, -6250336);
-        graphics.text(this.font, Component.literal("Password"), this.width / 2 - 100 + 1, 115, -6250336);
+        graphics.text(this.font, Component.literal(Translation.get("socksproxyclient.config.proxy.editing.address")), this.width / 2 - 100 + 1, 33, -6250336);
+        graphics.text(this.font, Component.literal(Translation.get("socksproxyclient.config.proxy.editing.username")), this.width / 2 - 100 + 1, 74, -6250336);
+        graphics.text(this.font, Component.literal(Translation.get("socksproxyclient.config.proxy.editing.password")), this.width / 2 - 100 + 1, 115, -6250336);
         this.proxyAddressField.extractRenderState(graphics, mouseX, mouseY, a);
         this.usernameField.extractRenderState(graphics, mouseX, mouseY, a);
         this.passwordField.extractRenderState(graphics, mouseX, mouseY, a);

@@ -172,6 +172,7 @@ public final class HttpProxy {
                 }
 
                 parsed = true;
+                LogUtils.logDebug("connectMethod: {}, httpVersion: {}, remoteHttpHost: {}, remoteHttpPort: {}", connectMethod, httpVersion, remoteHttpHost, remoteHttpPort);
             }
 
             if (remote == null) {

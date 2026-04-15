@@ -5,6 +5,7 @@ import dev.pinebale.minecraft.fabric.socksproxyclient.config.ConfigUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.ProxyConfig;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.entry.ProxyEntry;
 import dev.pinebale.minecraft.fabric.socksproxyclient.utils.BaseUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.fabricmc.api.EnvType;
@@ -35,7 +36,9 @@ public final class ProxyUtils {
                 if (inputIPObject instanceof Inet6Address) {
                     return false;
                 }
-                if (entry.contains("/") && BaseUtils.isIpInCidr(inputIPObject, entry)) {
+                final boolean v = BaseUtils.isIpInCidr(inputIPObject, entry);
+                LogUtils.logDebug("isIpInCidr: {}", v);
+                if (entry.contains("/") && v) {
                     return true;
                 } else {
                     InetAddress entryIPObject = InetAddresses.forString(entry);

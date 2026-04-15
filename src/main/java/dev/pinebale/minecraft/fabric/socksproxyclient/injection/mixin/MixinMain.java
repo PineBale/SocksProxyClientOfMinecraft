@@ -5,6 +5,7 @@ import dev.pinebale.minecraft.fabric.socksproxyclient.config.ConfigUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.SocksProxyClientConfig;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpProxy;
 import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinMain {
     @Inject(method = "main", at = @At(value = "HEAD"))
     private static void injected(String[] args, CallbackInfo ci) throws Exception {
+        Translation.load();
         LogUtils.logInfo(String.format("Starting %s %s (Git: %s)", RevConstants.MOD_NAME, RevConstants.MOD_VERSION, RevConstants.MOD_DEV_VERSION));
         LogUtils.logInfo("Loading config");
         SocksProxyClientConfig.initRootPath(FabricLoader.getInstance().getConfigDir().resolve(RevConstants.MOD_ID));

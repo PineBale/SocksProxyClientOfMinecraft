@@ -3,6 +3,7 @@ package dev.pinebale.minecraft.fabric.socksproxyclient.dns.screen;
 import dev.pinebale.minecraft.fabric.socksproxyclient.dns.DNSUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.dns.SocksProxyClientDNSResolver;
 import dev.pinebale.minecraft.fabric.socksproxyclient.dns.SystemResolver;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import lombok.NonNull;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,8 +25,8 @@ public final class DNSConfigScreen extends Screen {
 
     private final Screen parent;
 
-    private final Class initialResolverSelection;
-    private final boolean initialShouldDismissHosts;
+    private Class resolverSelection;
+    private boolean shouldDismissHostsSelection;
 
     private CycleButton<Class> resolverButton;
     private CycleButton<Boolean> dismissHostsButton;
@@ -36,11 +37,11 @@ public final class DNSConfigScreen extends Screen {
         @NonNull final Screen parent,
         @NonNull final BiConsumer<Class<? extends SocksProxyClientDNSResolver>, Boolean> callback
     ) {
-        super(Component.literal("DNS config"));
+        super(Component.literal(Translation.get("socksproxyclient.config.dns")));
         this.parent = parent;
         try {
-            this.initialResolverSelection = DNSUtils.getResolverClass();
-            this.initialShouldDismissHosts = DNSUtils.shouldDismissSystemHosts();
+            this.resolverSelection = DNSUtils.getResolverClass();
+            this.shouldDismissHostsSelection = DNSUtils.shouldDismissSystemHosts();
         } catch (Throwable e) {
             throw new Error(e);
         }
@@ -63,10 +64,10 @@ public final class DNSConfigScreen extends Screen {
             } catch (Exception e) {
                 throw new Error(e);
             }
-        }, this.initialResolverSelection).withValues(resolvers).create(this.width / 2 - 100, 86, 200, 20, Component.literal("DNS resolver"), (_, _) -> this.updateDismissHostsButton());
+        }, this.resolverSelection).withValues(resolvers).create(this.width / 2 - 100, 86, 200, 20, Component.literal(Translation.get("socksproxyclient.config.dns.resolver")), (_, _) -> this.updateDismissHostsButton());
         this.addRenderableWidget(this.resolverButton);
 
-        this.dismissHostsButton = CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO, this.initialShouldDismissHosts).create(this.width / 2 - 100, 126, 200, 20, Component.literal("Should dismiss system hosts"));
+        this.dismissHostsButton = CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO, this.shouldDismissHostsSelection).create(this.width / 2 - 100, 126, 200, 20, Component.literal(Translation.get("socksproxyclient.config.dns.shouldDismissSystemHosts")));
         this.addRenderableWidget(this.dismissHostsButton);
 
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, _ -> this.onClose())
@@ -85,6 +86,13 @@ public final class DNSConfigScreen extends Screen {
     @Override
     protected void setInitialFocus() {
         this.setInitialFocus(resolverButton);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        this.resolverSelection = this.resolverButton.getValue();
+        this.shouldDismissHostsSelection = this.dismissHostsButton.getValue();
+        super.resize(width, height);
     }
 
     @Override

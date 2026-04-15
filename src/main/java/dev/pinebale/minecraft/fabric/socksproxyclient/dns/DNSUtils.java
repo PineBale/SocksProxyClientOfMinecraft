@@ -52,6 +52,7 @@ public final class DNSUtils {
         lookup.setCache(null);
         int count = 0;
         while (count < 3) {
+            LogUtils.logDebug("performLookup count: {}", count);
             lookup.run();
             while (true) {
                 try {
@@ -63,6 +64,7 @@ public final class DNSUtils {
             }
             Record[] records = lookup.getAnswers();
             if (records == null || records.length == 0) {
+                LogUtils.logDebug("No records found! {}: {}", lookup.getResult(), lookup.getErrorString());
                 if (lookup.getResult() == Lookup.TRY_AGAIN) {
                     count++;
                     continue;

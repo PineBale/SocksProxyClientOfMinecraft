@@ -57,6 +57,7 @@ public final class DNSOverHTTPSResolver implements SocksProxyClientDNSResolver {
         final Lookup lookup = new Lookup(hostname, recordType);
         lookup.setResolver(resolver);
         if (DNSUtils.shouldDismissSystemHosts()) {
+            LogUtils.logDebug("DNSOverHTTPSResolver: shouldDismissSystemHosts true");
             lookup.setHostsFileParser(null);
         }
         res = DNSUtils.performLookup(lookup);

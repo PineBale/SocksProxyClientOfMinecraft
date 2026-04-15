@@ -19,6 +19,7 @@ public final class BaseUtils {
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 
     public static boolean isIpInCidr(InetAddress ip, String cidr) {
+        LogUtils.logDebug("isIpInCidr: ip {}, cidr {}", ip, cidr);
         try {
             String[] parts = cidr.split("/");
             InetAddress network = InetAddresses.forString(parts[0]);

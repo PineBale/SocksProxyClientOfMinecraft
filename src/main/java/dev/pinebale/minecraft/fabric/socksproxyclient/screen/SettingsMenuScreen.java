@@ -9,6 +9,7 @@ import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSProvider;
 import dev.pinebale.minecraft.fabric.socksproxyclient.doh.config.DNSOverHTTPSConfig;
 import dev.pinebale.minecraft.fabric.socksproxyclient.doh.screen.ChooseDOHProviderScreen;
 import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -55,8 +56,9 @@ public final class SettingsMenuScreen extends Screen {
     private final List<Button> buttons = new ArrayList<>();
     private final ImmutableList<Category> categories;
 
+    @SuppressWarnings("unchecked")
     public SettingsMenuScreen(Screen parent) {
-        super(Component.empty());
+        super(Component.literal(Translation.get("socksproxyclient.config")));
         this.parent = parent;
 
         ImmutableList.Builder listBuilder = ImmutableList.builder().add(
@@ -82,7 +84,7 @@ public final class SettingsMenuScreen extends Screen {
                 } catch (Throwable e) {
                     throw new Error(e);
                 }
-                LogUtils.logDebug("doh provider: {} custom url: {}", p.getDisplayName(), u);
+                LogUtils.logDebug("doh provider: {}, custom url: {}", p.getDisplayName(), u);
             }))
         );
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
@@ -181,6 +183,8 @@ public final class SettingsMenuScreen extends Screen {
         graphics.disableScissor();
 
         super.extractRenderState(graphics, mouseX, mouseY, a);
+        graphics.centeredText(this.font, this.title, this.width / 2, 17, -1);
+
         if (this.maxScroll > 0) {
             double thumbHeight = Math.clamp(this.scrollBarHeight / (this.maxScroll + this.scrollBarHeight) * this.scrollBarHeight, 10, this.scrollBarHeight);
             int thumbY = this.scrollBarY + (int) (this.scrollAmount / this.maxScroll * (this.scrollBarHeight - thumbHeight));

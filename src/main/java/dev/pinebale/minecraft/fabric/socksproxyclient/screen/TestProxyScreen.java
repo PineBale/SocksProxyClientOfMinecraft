@@ -13,6 +13,7 @@ import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.ProxyUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.SocksUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.utils.BaseUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import lombok.NonNull;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -55,7 +56,7 @@ public final class TestProxyScreen extends Screen {
 
     @Override
     protected void init() {
-        this.runTestButton = this.addRenderableWidget(Button.builder(Component.literal("Run test"), _ -> this.doTest())
+        this.runTestButton = this.addRenderableWidget(Button.builder(Component.literal(Translation.get("socksproxyclient.config.proxy.test")), _ -> this.doTest())
             .bounds(this.width / 2 - 100, 126, 200, 20).build());
 
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, _ -> this.onClose())
@@ -119,7 +120,7 @@ public final class TestProxyScreen extends Screen {
         this.minecraft.submit(() -> SystemToast.add(
             this.minecraft.getToastManager(),
             new SystemToast.SystemToastId(1000L),
-            Component.literal("Testing proxy connectivity"),
+            Component.literal(Translation.get("socksproxyclient.config.proxy.testing")),
             Component.literal(target)));
     }
 
@@ -169,7 +170,7 @@ public final class TestProxyScreen extends Screen {
         this.minecraft.submit(() -> SystemToast.add(
             this.minecraft.getToastManager(),
             new SystemToast.SystemToastId(3000L),
-            Component.literal(res.getLeft() ? "Success" : "Failed"),
+            Component.literal(Translation.get(res.getLeft() ? "socksproxyclient.config.proxy.test.success" : "socksproxyclient.config.proxy.test.failure")),
             Component.literal(target)));
 
         if (res.getLeft()) {

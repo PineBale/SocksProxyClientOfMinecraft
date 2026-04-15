@@ -7,6 +7,8 @@ import dev.pinebale.minecraft.fabric.socksproxyclient.injection.access.IMixinCon
 import dev.pinebale.minecraft.fabric.socksproxyclient.injection.access.IMixinServerData_Proxy;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.ProxyUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.SocksUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import io.netty.channel.ChannelPipeline;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -92,15 +94,18 @@ public final class ProxyMixinUtils {
         }
         CycleButton.Builder<Boolean> builder = CycleButton.builder(o -> o ? Component.translatable("gui.yes").withStyle(ChatFormatting.GREEN) : Component.translatable("gui.none").withStyle(ChatFormatting.GRAY), initial);
         builder.withValues(true, false);
-        CycleButton<Boolean> buttonWidget = builder.create(x, y, width, height, Component.literal("Always Opt out"), (_, value) -> ((IMixinServerData_Proxy) serverData).socksProxyClient$setUseProxy(!value));
-        buttonWidget.setTooltip(Tooltip.create(Component.translatable("gui.yes").append(Component.literal(": Always opt out. \n")).append(Component.translatable("gui.none").append(Component.literal(": Subject to configuration.")))));
+        CycleButton<Boolean> buttonWidget = builder.create(x, y, width, height, Component.literal(Translation.get("socksproxyclient.config.base.optout.enabled")), (_, value) -> ((IMixinServerData_Proxy) serverData).socksProxyClient$setUseProxy(!value));
+        buttonWidget.setTooltip(Tooltip.create(Component.translatable("gui.yes").append(Component.literal(": " + Translation.get("socksproxyclient.config.base.optout.enabled") + "\n")).append(Component.translatable("gui.none").append(Component.literal(Translation.get("socksproxyclient.config.base.optout.none"))))));
         buttonWidget.active = v;
         return buttonWidget;
     }
 
     private static boolean booleanProxyConfigField(String field) {
+        LogUtils.logDebug("booleanProxyConfigField: {}", field);
         try {
-            return (Boolean) ConfigUtils.getEntryField(ProxyConfig.class, field).getValue();
+            final boolean v = (Boolean) ConfigUtils.getEntryField(ProxyConfig.class, field).getValue();
+            LogUtils.logDebug("booleanProxyConfigField {}: {}", field, v);
+            return v;
         } catch (Exception e) {
             throw new Error(e);
         }

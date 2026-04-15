@@ -4,6 +4,7 @@ import dev.pinebale.minecraft.fabric.socksproxyclient.dns.DNSUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSProvider;
 import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSResolver;
 import dev.pinebale.minecraft.fabric.socksproxyclient.doh.DNSOverHTTPSUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.Translation;
 import lombok.NonNull;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -22,8 +23,8 @@ public final class ChooseDOHProviderScreen extends Screen {
 
     private final Screen parent;
 
-    private final DNSOverHTTPSProvider initialDohSelection;
-    private final String initialCustomUrlSelection;
+    private DNSOverHTTPSProvider dohSelection;
+    private String customUrlSelection;
 
     private CycleButton<DNSOverHTTPSProvider> dohSelectionButton;
     private EditBox customUrlField;
@@ -34,11 +35,11 @@ public final class ChooseDOHProviderScreen extends Screen {
         @NonNull final Screen parent,
         @NonNull final BiConsumer<DNSOverHTTPSProvider, String> callback
     ) {
-        super(Component.literal("Choose a DNS-Over-HTTPS provider"));
+        super(Component.literal(Translation.get("socksproxyclient.config.doh")));
         this.parent = parent;
         try {
-            this.initialDohSelection = DNSOverHTTPSUtils.getProvider();
-            this.initialCustomUrlSelection = DNSOverHTTPSUtils.getCustomUrl();
+            this.dohSelection = DNSOverHTTPSUtils.getProvider();
+            this.customUrlSelection = DNSOverHTTPSUtils.getCustomUrl();
         } catch (Throwable e) {
             throw new Error(e);
         }
@@ -47,12 +48,11 @@ public final class ChooseDOHProviderScreen extends Screen {
 
     @Override
     protected void init() {
-        this.dohSelectionButton = CycleButton.builder(v -> Component.literal(v.getDisplayName()), this.initialDohSelection).withValues(DNSOverHTTPSProvider.values()).create(this.width / 2 - 100, 86, 200, 20, Component.literal("DNS-Over-HTTPS Provider"), (_, _) -> this.updateUrlField());
+        this.dohSelectionButton = CycleButton.builder(v -> Component.literal(v.getDisplayName()), this.dohSelection).withValues(DNSOverHTTPSProvider.values()).create(this.width / 2 - 100, 86, 200, 20, Component.literal(Translation.get("socksproxyclient.config.doh.provider")), (_, _) -> this.updateUrlField());
         this.addRenderableWidget(this.dohSelectionButton);
 
-        this.customUrlField = new EditBox(this.font, this.width / 2 - 100, 126, 200, 20,
-            Component.literal("Custom DNS-Over-HTTPS URL"));
-        this.customUrlField.setValue(this.initialCustomUrlSelection);
+        this.customUrlField = new EditBox(this.font, this.width / 2 - 100, 126, 200, 20, Component.empty());
+        this.customUrlField.setValue(this.customUrlSelection);
         this.addWidget(this.customUrlField);
 
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, _ -> this.onClose())
@@ -82,7 +82,7 @@ public final class ChooseDOHProviderScreen extends Screen {
         super.extractMenuBackground(graphics);
         super.extractRenderState(graphics, mouseX, mouseY, a);
         graphics.centeredText(this.font, this.title, this.width / 2, 17, -1);
-        graphics.text(this.font, Component.literal("Custom DNS-Over-HTTPS URL"), this.width / 2 - 100 + 1, 114, -6250336);
+        graphics.text(this.font, Component.literal(Translation.get("socksproxyclient.config.doh.customUrl")), this.width / 2 - 100 + 1, 114, -6250336);
         this.customUrlField.extractRenderState(graphics, mouseX, mouseY, a);
     }
 
@@ -90,6 +90,13 @@ public final class ChooseDOHProviderScreen extends Screen {
     public void onClose() {
         this.callback.accept(this.dohSelectionButton.getValue(), this.customUrlField.getValue());
         this.minecraft.setScreen(this.parent);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        this.dohSelection = this.dohSelectionButton.getValue();
+        this.customUrlSelection = this.customUrlField.getValue();
+        super.resize(width, height);
     }
 
     private void updateUrlField() {
