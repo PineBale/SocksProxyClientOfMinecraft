@@ -1,3 +1,5 @@
+name: Build jar
+
 on:
   push:
     branches:
@@ -77,5 +79,5 @@ jobs:
           name: ${{ github.run_id }}
           path: |
             ./build/libs/*.jar
-          retention-days: 3
+          retention-days: 1
           overwrite: true
