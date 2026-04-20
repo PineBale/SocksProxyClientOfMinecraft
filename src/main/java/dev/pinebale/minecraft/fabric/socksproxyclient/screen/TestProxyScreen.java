@@ -19,6 +19,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
@@ -56,13 +57,14 @@ public final class TestProxyScreen extends Screen {
 
     @Override
     protected void init() {
-        this.runTestButton = this.addRenderableWidget(Button.builder(Component.literal(Translation.get("socksproxyclient.config.proxy.test")), _ -> this.doTest())
-            .bounds(this.width / 2 - 100, 126, 200, 20).build());
+        this.runTestButton = Button.builder(Component.literal(Translation.get("socksproxyclient.config.proxy.runTest")), _ -> this.doTest()).bounds(this.width / 2 - 100, 126, 200, 20).build();
+        this.runTestButton.setTooltip(null);
+        this.addRenderableWidget(this.runTestButton);
 
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, _ -> this.onClose())
             .bounds(this.width / 2 - 100, this.height - 30, 200, 20).build());
 
-        this.updateTestButton();
+        this.updateRunTestButton();
     }
 
     private void doTest() {
@@ -201,13 +203,22 @@ public final class TestProxyScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, a);
     }
 
-    private void updateTestButton() {
-        this.runTestButton.active = !SocksUtils.supplier().get().isEmpty() && System.currentTimeMillis() - testTime > 5000L;
+    private void updateRunTestButton() {
+        if (SocksUtils.supplier().get().isEmpty()) {
+            this.runTestButton.setTooltip(Tooltip.create(Component.literal(Translation.get("socksproxyclient.config.proxy.runTest.disabled.emptyProxyChain"))));
+            this.runTestButton.active = false;
+        } else if (System.currentTimeMillis() - testTime <= 5000L) {
+            this.runTestButton.setTooltip(null);
+            this.runTestButton.active = false;
+        } else {
+            this.runTestButton.setTooltip(null);
+            this.runTestButton.active = true;
+        }
     }
 
     @Override
     public void tick() {
-        this.updateTestButton();
+        this.updateRunTestButton();
         pinger.tick();
     }
 

@@ -85,11 +85,6 @@ public final class ProxyEntryEditScreen extends Screen {
     }
 
     @Override
-    protected void setInitialFocus() {
-        this.setInitialFocus(this.proxyAddressField);
-    }
-
-    @Override
     public void resize(int width, int height) {
         String string = this.proxyAddressField.getValue();
         String string2 = this.usernameField.getValue();

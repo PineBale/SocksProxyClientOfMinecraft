@@ -12,10 +12,12 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
+import java.text.MessageFormat;
 import java.util.function.BiConsumer;
 
 @Environment(EnvType.CLIENT)
@@ -35,7 +37,7 @@ public final class ChooseDOHProviderScreen extends Screen {
         @NonNull final Screen parent,
         @NonNull final BiConsumer<DNSOverHTTPSProvider, String> callback
     ) {
-        super(Component.literal(Translation.get("socksproxyclient.config.doh")));
+        super(Component.literal(Translation.get("socksproxyclient.config.doh.description")));
         this.parent = parent;
         try {
             this.dohSelection = DNSOverHTTPSUtils.getProvider();
@@ -49,6 +51,7 @@ public final class ChooseDOHProviderScreen extends Screen {
     @Override
     protected void init() {
         this.dohSelectionButton = CycleButton.builder(v -> Component.literal(v.getDisplayName()), this.dohSelection).withValues(DNSOverHTTPSProvider.values()).create(this.width / 2 - 100, 86, 200, 20, Component.literal(Translation.get("socksproxyclient.config.doh.provider")), (_, _) -> this.updateUrlField());
+        this.dohSelectionButton.setTooltip(null);
         this.addRenderableWidget(this.dohSelectionButton);
 
         this.customUrlField = new EditBox(this.font, this.width / 2 - 100, 126, 200, 20, Component.empty());
@@ -61,6 +64,7 @@ public final class ChooseDOHProviderScreen extends Screen {
         try {
             if (!DNSUtils.getResolverClass().equals(DNSOverHTTPSResolver.class)) {
                 this.dohSelectionButton.active = false;
+                this.dohSelectionButton.setTooltip(this.createTooltip());
                 this.customUrlField.active = false;
                 this.customUrlField.setEditable(false);
                 return;
@@ -70,11 +74,6 @@ public final class ChooseDOHProviderScreen extends Screen {
         }
 
         this.updateUrlField();
-    }
-
-    @Override
-    protected void setInitialFocus() {
-        this.setInitialFocus(this.dohSelectionButton);
     }
 
     @Override
@@ -103,5 +102,13 @@ public final class ChooseDOHProviderScreen extends Screen {
         boolean v = this.dohSelectionButton.getValue().equals(DNSOverHTTPSProvider.CUSTOM);
         this.customUrlField.active = v;
         this.customUrlField.setEditable(v);
+    }
+
+    private Tooltip createTooltip() {
+        try {
+            return Tooltip.create(Component.literal(MessageFormat.format(Translation.get("socksproxyclient.config.doh.disabled"), Translation.get("socksproxyclient.config.dns.resolver"), DNSUtils.getResolverName(DNSOverHTTPSResolver.class))));
+        } catch (Throwable e) {
+            throw new Error(e);
+        }
     }
 }

@@ -84,11 +84,6 @@ public final class DNSConfigScreen extends Screen {
     }
 
     @Override
-    protected void setInitialFocus() {
-        this.setInitialFocus(resolverButton);
-    }
-
-    @Override
     public void resize(int width, int height) {
         this.resolverSelection = this.resolverButton.getValue();
         this.shouldDismissHostsSelection = this.dismissHostsButton.getValue();
