@@ -39,6 +39,7 @@ public final class DNSOverHTTPSResolver implements SocksProxyClientDNSResolver {
 
     public List<Record> resolve(final String hostname, final int recordType) throws Exception {
         initCache();
+        LogUtils.logDebug("DNSOverHTTPSResolver: hostname {}, recordType {}", hostname, recordType);
         // A record or SRV record
         List<Record> res = null;
         if (recordType == Type.A || recordType == Type.SRV) {
@@ -47,8 +48,9 @@ public final class DNSOverHTTPSResolver implements SocksProxyClientDNSResolver {
         if (res != null) {
             if (res.isEmpty()) {
                 cache.invalidate(hostname);
+                LogUtils.logDebug("DOH Cache invalidated. hostname: {}", hostname);
             } else {
-                LogUtils.logDebug("Cache hit: {}", hostname);
+                LogUtils.logDebug("DOH Cache hit: {}", hostname);
                 return res;
             }
         }
@@ -60,9 +62,11 @@ public final class DNSOverHTTPSResolver implements SocksProxyClientDNSResolver {
             LogUtils.logDebug("DNSOverHTTPSResolver: shouldDismissSystemHosts true");
             lookup.setHostsFileParser(null);
         }
+        LogUtils.logDebug("DNSOverHTTPSResolver calling DNSUtils.performLookup");
         res = DNSUtils.performLookup(lookup);
         if (!res.isEmpty()) {
             cache.put(hostname, res);
+            LogUtils.logDebug("DOH Cache add hostname: {}", hostname);
         }
         return res;
     }

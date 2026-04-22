@@ -55,8 +55,10 @@ public class MixinServerNameResolver {
         this.resolver = serverAddress -> {
             try {
                 if (InetAddresses.isInetAddress(serverAddress.getHost())) {
+                    LogUtils.logDebug("redirectResolver: {} is IP literal.", serverAddress.getHost());
                     return Optional.of(ResolvedServerAddress.from(new InetSocketAddress(serverAddress.getHost(), serverAddress.getPort())));
                 }
+                LogUtils.logDebug("redirectResolver: {} is not IP literal. Going back to originalResolver", serverAddress.getHost());
                 return originalResolver(serverAddress);
             } catch (Throwable e) {
                 LogUtils.logError("Couldn't resolve {}", serverAddress.getHost(), e);
@@ -78,8 +80,10 @@ public class MixinServerNameResolver {
             if (serverAddress.getPort() == BaseConstants.DEFAULT_MINECRAFT_PORT) {
                 try {
                     if (InetAddresses.isInetAddress(serverAddress.getHost())) {
+                        LogUtils.logDebug("redirectRedirectHandler: {} is IP literal.", serverAddress.getHost());
                         return Optional.of(new ServerAddress(serverAddress.getHost(), serverAddress.getPort()));
                     }
+                    LogUtils.logDebug("redirectRedirectHandler: {} is not IP literal. Going back to originalRedirectHandler", serverAddress.getHost());
                     return originalRedirectHandler(serverAddress);
                 } catch (Throwable e) {
                     LogUtils.logWarning("Couldn't resolve _minecraft._tcp.{}: {}", serverAddress.getHost(), e.getMessage());
@@ -93,7 +97,7 @@ public class MixinServerNameResolver {
     private Optional<ResolvedServerAddress> originalResolver(ServerAddress serverAddress) throws Exception {
         List<Record> records = resolve(serverAddress.getHost(), Type.A);
         final ARecord arec = (ARecord) records.get(0);
-        LogUtils.logDebug("{}", arec);
+        LogUtils.logDebug("originalResolver: Got ARecord: {}", arec);
         InetAddress inetAddress = InetAddress.getByAddress(serverAddress.getHost(), arec.getAddress().getAddress());
         LogUtils.logInfo("Successfully resolve {} to {}", serverAddress.getHost(), inetAddress.getHostAddress());
         return Optional.of(ResolvedServerAddress.from(new InetSocketAddress(inetAddress, serverAddress.getPort())));
@@ -104,7 +108,7 @@ public class MixinServerNameResolver {
         String addr0 = "_minecraft._tcp." + serverAddress.getHost();
         List<Record> records = resolve(addr0, Type.SRV);
         final SRVRecord srv = (SRVRecord) records.get(0);
-        LogUtils.logDebug("{}", srv);
+        LogUtils.logDebug("originalRedirectHandler: Got SRVRecord: {}", srv);
         String host = srv.getTarget().toString(true);
         LogUtils.logInfo("Successfully resolve {} to {}:{}", addr0, host, srv.getPort());
         return Optional.of(new ServerAddress(host, srv.getPort()));

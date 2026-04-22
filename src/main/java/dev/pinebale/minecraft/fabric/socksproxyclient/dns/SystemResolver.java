@@ -1,5 +1,6 @@
 package dev.pinebale.minecraft.fabric.socksproxyclient.dns;
 
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import lombok.NoArgsConstructor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,6 +24,7 @@ public final class SystemResolver implements SocksProxyClientDNSResolver {
         resolver.setTimeout(Duration.ofSeconds(2L));
         final Lookup lookup = new Lookup(hostname, recordType);
         lookup.setResolver(resolver);
+        LogUtils.logDebug("SystemResolver calling DNSUtils.performLookup");
         return DNSUtils.performLookup(lookup);
     }
 }

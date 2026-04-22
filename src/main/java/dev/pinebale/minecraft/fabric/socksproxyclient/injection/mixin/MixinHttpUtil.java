@@ -2,6 +2,7 @@ package dev.pinebale.minecraft.fabric.socksproxyclient.injection.mixin;
 
 import dev.pinebale.minecraft.fabric.socksproxyclient.injection.ProxyMixinUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.HttpUtil;
@@ -22,6 +23,7 @@ public class MixinHttpUtil {
         )
     )
     private static Proxy redirectedGet(Proxy instance) {
+        LogUtils.logDebug("MixinHttpUtil downloadFile redirectedGet: Calling HttpUtils.getProxyObject");
         return HttpUtils.getProxyObject(ProxyMixinUtils.proxyAssetsDownload());
     }
 }

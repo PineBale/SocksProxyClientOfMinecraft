@@ -3,6 +3,7 @@ package dev.pinebale.minecraft.fabric.socksproxyclient.injection.mixin;
 import com.mojang.patchy.MojangBlockListSupplier;
 import dev.pinebale.minecraft.fabric.socksproxyclient.injection.ProxyMixinUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,6 +23,7 @@ public class MixinMojangBlockListSupplier {
         remap = false
     )
     private URLConnection redirectedGet(URL instance) throws IOException {
+        LogUtils.logDebug("MixinMojangBlockListSupplier createBlockList redirectedGet: Calling HttpUtils.getProxyObject");
         return instance.openConnection(HttpUtils.getProxyObject(ProxyMixinUtils.proxyBlockListSupplier()));
     }
 }

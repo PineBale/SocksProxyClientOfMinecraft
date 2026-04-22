@@ -44,7 +44,7 @@ public abstract class CategoryListScreen extends Screen {
 
     @FunctionalInterface
     protected interface CategoryButtonSupplier {
-        AbstractButton get(Minecraft minecraft, Component component, final int x, final int y, final int width, final int height);
+        AbstractButton get(final Minecraft minecraft, final Component component, final int x, final int y, final int width, final int height);
     }
     protected record Category(Component title, CategoryButtonSupplier buttonSupplier) {}
 

@@ -2,6 +2,7 @@ package dev.pinebale.minecraft.fabric.socksproxyclient.doh.injection.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +41,7 @@ public class MixinDohResolver {
         builder.proxy(new ProxySelector() {
             @Override
             public List<Proxy> select(URI uri) {
+                LogUtils.logDebug("MixinDohResolver lambda$getHttpClient$0 injected: Calling HttpUtils.getProxyObject");
                 return List.of(HttpUtils.getProxyObject());
             }
 
@@ -56,6 +58,7 @@ public class MixinDohResolver {
         remap = false
     )
     private URLConnection redirected(URL instance) throws IOException {
+        LogUtils.logDebug("MixinDohResolver sendAndGetMessageBytes redirected: Calling HttpUtils.getProxyObject");
         return instance.openConnection(HttpUtils.getProxyObject());
     }
 }

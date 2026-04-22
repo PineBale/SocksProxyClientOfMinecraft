@@ -17,7 +17,7 @@ public final class HttpUtils {
     }
 
     public static Proxy getProxyObject(boolean useProxy) {
-        LogUtils.logDebug("HttpUtils getProxyObject: {}", useProxy);
+        LogUtils.logDebug("HttpUtils getProxyObject: useProxy {}", useProxy);
         if (!useProxy || !HttpProxy.INSTANCE.isFired()) {
             return Proxy.NO_PROXY;
         } else {

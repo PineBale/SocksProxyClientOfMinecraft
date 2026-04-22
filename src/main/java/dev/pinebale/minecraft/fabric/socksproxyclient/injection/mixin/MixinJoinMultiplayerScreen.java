@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.ConfigUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.config.ProxyInternalConfig;
 import dev.pinebale.minecraft.fabric.socksproxyclient.injection.access.IMixinServerData_Proxy;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -47,6 +48,7 @@ public class MixinJoinMultiplayerScreen {
     private void saveProxyInternal(boolean directConnectUseProxy) throws Exception {
         ProxyInternalConfig proxyInternalConfig = ConfigUtils.getConfigInstance(ProxyInternalConfig.class);
         proxyInternalConfig.getEntryField("directConnectUseProxy", Boolean.class).setValue(directConnectUseProxy);
+        LogUtils.logDebug("directConnectUseProxy: {}", directConnectUseProxy);
         proxyInternalConfig.save();
     }
 }

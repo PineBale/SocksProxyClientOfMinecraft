@@ -3,6 +3,7 @@ package dev.pinebale.minecraft.fabric.socksproxyclient.injection.mixin;
 import com.mojang.authlib.minecraft.client.MinecraftClient;
 import dev.pinebale.minecraft.fabric.socksproxyclient.injection.ProxyMixinUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.objectweb.asm.Opcodes;
@@ -29,6 +30,7 @@ public class MixinAuthlibMinecraftClient {
         remap = false
     )
     private Proxy redirected(MinecraftClient instance) {
+        LogUtils.logDebug("MixinAuthlibMinecraftClient createUrlConnection redirected: Calling HttpUtils.getProxyObject");
         return HttpUtils.getProxyObject(ProxyMixinUtils.proxyYggdrasil());
     }
 
@@ -38,6 +40,7 @@ public class MixinAuthlibMinecraftClient {
         remap = false
     )
     private void redirected(MinecraftClient instance, Proxy value) {
+        LogUtils.logDebug("MixinAuthlibMinecraftClient <init> redirected: Calling HttpUtils.getProxyObject");
         this.proxy = HttpUtils.getProxyObject(ProxyMixinUtils.proxyYggdrasil());
     }
 }

@@ -23,6 +23,7 @@ public final class NettyResolver extends InetNameResolver {
     }
 
     private List<InetAddress> getInetAddresses(final String hostname) throws Exception {
+        LogUtils.logDebug("NettyResolver.getInetAddresses: hostname: {}", hostname);
         if (InetAddresses.isInetAddress(hostname)) {
             return List.of(InetAddress.getByName(hostname));
         }

@@ -1,6 +1,7 @@
 package dev.pinebale.minecraft.fabric.socksproxyclient.injection.mixin;
 
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -16,6 +17,7 @@ import java.net.Proxy;
 public class MixinMinecraft {
     @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;proxy:Ljava/net/Proxy;", opcode = Opcodes.GETFIELD))
     private Proxy redirectedGet(Minecraft instance) {
+        LogUtils.logDebug("MixinMinecraft <init> redirectedGet: Calling HttpUtils.getProxyObject");
         return HttpUtils.getProxyObject();
     }
 }

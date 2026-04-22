@@ -54,7 +54,7 @@ public class MixinConnection implements IMixinConnection {
     )
     private static void injected(final InetSocketAddress address, final EventLoopGroupHolder eventLoopGroupHolder, final LocalSampleLogger bandwidthLogger, CallbackInfoReturnable<Connection> cir, @Local(name = "connection") Connection connection) {
         ((IMixinConnection) connection).socksProxyClient$setServerData(((IMixinLocalSampleLogger) bandwidthLogger).socksProxyClient$getPingingServerData());
-        LogUtils.logDebug("Pinging remote Minecraft server {}", address);
+        LogUtils.logDebug("MixinConnection: Pinging remote Minecraft server {}", address);
     }
 
     @Inject(
@@ -63,6 +63,6 @@ public class MixinConnection implements IMixinConnection {
     )
     private static void injected(final InetSocketAddress address, final EventLoopGroupHolder eventLoopGroupHolder, final Connection connection, CallbackInfoReturnable<ChannelFuture> cir) {
         ((IMixinConnection) connection).socksProxyClient$setInetSocketAddress(address);
-        LogUtils.logDebug("Connecting to remote Minecraft server {}", address);
+        LogUtils.logDebug("MixinConnection: Connecting to remote Minecraft server {}", address);
     }
 }

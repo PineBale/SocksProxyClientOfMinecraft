@@ -4,6 +4,7 @@ import com.mojang.realmsclient.client.RealmsClient;
 import com.mojang.realmsclient.client.RealmsClientConfig;
 import dev.pinebale.minecraft.fabric.socksproxyclient.injection.ProxyMixinUtils;
 import dev.pinebale.minecraft.fabric.socksproxyclient.proxy.HttpUtils;
+import dev.pinebale.minecraft.fabric.socksproxyclient.utils.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +18,7 @@ import java.net.Proxy;
 public class MixinRealmsClient {
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/realmsclient/client/RealmsClientConfig;setProxy(Ljava/net/Proxy;)V"))
     private void redirected(Proxy proxy) {
+        LogUtils.logDebug("MixinRealmsClient <init> redirected: Calling HttpUtils.getProxyObject");
         RealmsClientConfig.setProxy(HttpUtils.getProxyObject(ProxyMixinUtils.proxyRealmsApi()));
     }
 }

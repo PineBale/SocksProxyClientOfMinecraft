@@ -101,10 +101,10 @@ public final class ProxyMixinUtils {
     }
 
     private static boolean booleanProxyConfigField(String field) {
-        LogUtils.logDebug("booleanProxyConfigField: {}", field);
+        LogUtils.logDebug("ProxyMixinUtils booleanProxyConfigField: {}", field);
         try {
             final boolean v = (Boolean) ConfigUtils.getEntryField(ProxyConfig.class, field).getValue();
-            LogUtils.logDebug("booleanProxyConfigField {}: {}", field, v);
+            LogUtils.logDebug("ProxyMixinUtils booleanProxyConfigField {}: {}", field, v);
             return v;
         } catch (Exception e) {
             throw new Error(e);
